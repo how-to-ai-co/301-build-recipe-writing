@@ -1,82 +1,96 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Metadata } from "next";
-import { ArrowUpRight } from "lucide-react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { blob } from "@/content/writing";
 import { Topbar } from "../topbar";
 
-export const metadata: Metadata = { title: "See an example | 301 Build Recipe: Writing | How to AI" };
+export const metadata: Metadata = { title: "Worked example | 301 Build Recipe: Writing | How to AI" };
 
 const dir = join(process.cwd(), "examples/pricing");
 const read = (f: string) => readFileSync(join(dir, f), "utf8").trim();
 
-const idea = read("idea.md");
-const first = read("claude-first.md");
-const check = read("check.txt");
-const fixed = read("claude.md");
-const mine = read("mine.md");
-const learn = read("learn.md");
-const patterns = learn.split("## Patterns in your edit")[1].split("## Rules")[0].trim();
-const kept = learn.match(/You kept (\d+) of them \((\d+)%\)/)!;
-const total = learn.match(/Claude wrote (\d+) words/)![1];
-const newRules = read("RULES.md").split("\n### ").slice(1)
-  .map(r => { const [title, ...rest] = r.split("\n"); return { title, why: rest.find(l => l.startsWith("- Why"))?.split(": ").slice(1).join(": ") ?? "" }; })
-  .filter(r => /^R[789]\./.test(r.title));
+// idea.md: "Label: text" lines
+const idea = read("idea.md").split("\n").map(l => { const [k, ...v] = l.split(": "); return { k, v: v.join(": ") }; }).filter(x => x.k !== "Slug");
 
-const Step = ({ n, title, who, children }: { n: number; title: string; who: string; children: React.ReactNode }) =>
-  <section className="ex-step">
-    <div className="ex-label"><span className="loop-n">{n}</span><div><b>{title}</b><span>{who}</span></div></div>
-    <div className="ex-body">{children}</div>
-  </section>;
+// check.txt: "R1 · "quote"" then "breaks: ..."
+const check = read("check.txt");
+const flags = [...check.matchAll(/^(R\d+) · "(.+?)"\s*\n\s*breaks: (.+)$/gm)].map(m => ({ rule: m[1], quote: m[2], breaks: m[3] }));
+const flaggedRules = new Set(flags.map(f => f.rule)).size;
+
+// learn.md: kept words and the three patterns
+const learn = read("learn.md");
+const [, draftWords, keptWords, pct] = learn.match(/Claude wrote (\d+) words\. You kept (\d+) of them \((\d+)%\)/)!;
+const patterns = [...learn.matchAll(/- Claude: "(.+?)"\n\s+- You: "(.+?)"\n\s+- Why\? \*"(.+?)"\*/g)].map(m => ({ was: m[1], now: m[2], why: m[3] }));
+
+// RULES.md: the rules this edit added
+const rules = read("RULES.md").split("\n### ").slice(1).map(r => r.split("\n")[0]).filter(t => /^R[789]\./.test(t));
+const totalRules = read("RULES.md").split("\n### ").length - 1;
 
 export default function Example() {
   return <>
     <div className="wrap">
       <Topbar active="example" />
-      <header className="hero inside-hero">
-        <div className="course-tag"><span className="course-num">AI 301</span><span>See an example</span></div>
-        <h1>One piece, start to finish.</h1>
-        <p className="lede">A freelance designer&apos;s newsletter, kept short to fit on a screen. Their first six rules came from a blind rewrite in class. Here&apos;s their next piece going through the loop.</p>
+      <p className="meta">AI 301 workshop · Writing · Worked example · One newsletter piece, idea to new rules</p>
+
+      <header className="top">
+        <h1>A short newsletter piece went through the loop once and left behind three new rules</h1>
+        <div className="grid-3">
+          <div className="card stat-card">
+            <span className="big">{pct}%</span>
+            <div className="bar-track" role="img" aria-label={`${keptWords} of ${draftWords} words kept`}><div className="bar-fill" style={{ width: `${pct}%` }} /></div>
+            <span className="label">of Claude&apos;s words kept ({keptWords} of {draftWords})</span>
+          </div>
+          <div className="card stat-card">
+            <span className="big">{flags.length}</span>
+            <span className="label">lines the checker flagged before the writer saw it</span>
+          </div>
+          <div className="card stat-card">
+            <span className="big">+{rules.length}</span>
+            <span className="label">rules from the edit, now {totalRules} in all</span>
+          </div>
+        </div>
+        <div className="ask">
+          <p><b>Want this for your own writing?</b> Copy the prompt into Claude Code.</p>
+          <a className="button main" href="./">Get the prompt</a>
+        </div>
       </header>
 
-      <div className="ex">
-        <Step n={1} title="Idea" who="The writer · idea.md">
-          <pre className="ex-text">{idea}</pre>
-        </Step>
+      <section className="section" aria-labelledby="idea">
+        <h2 id="idea">The writer gave Claude an idea and an opinion, nothing more</h2>
+        <ul className="card idea">{idea.map(i => <li key={i.k}><b>{i.k}:</b> {i.v}</li>)}</ul>
+      </section>
 
-        <Step n={2} title="Draft" who="The drafter · first pass">
-          <pre className="ex-text muted">{first}</pre>
-        </Step>
+      <section className="section" aria-labelledby="check">
+        <h2 id="check">The checker flagged {flags.length} lines against {flaggedRules} of the writer&apos;s rules</h2>
+        <ul className="card flags">{flags.map(f => <li key={f.quote}><span className="pill bad">{f.rule}</span><q>{f.quote}</q><span className="label">{f.breaks}</span></li>)}</ul>
+        <details className="more">
+          <summary>See Claude&apos;s first draft</summary>
+          <p className="text old md">{read("claude-first.md")}</p>
+        </details>
+      </section>
 
-        <Step n={3} title="Check" who="The checker · against RULES.md only">
-          <pre className="ex-text mono">{check}</pre>
-          <p className="note">The drafter fixes only the flagged lines, then the checker runs again. Nothing flagged on round two.</p>
-        </Step>
+      <section className="section" aria-labelledby="edit">
+        <h2 id="edit">The writer rewrote the checked draft</h2>
+        <div className="grid-2">
+          <div className="card"><h3 className="label" style={{ marginBottom: 10 }}>Claude&apos;s checked draft</h3><p className="text old">{read("claude.md")}</p></div>
+          <div className="card"><h3 className="label" style={{ marginBottom: 10 }}>What the writer published</h3><p className="text">{read("mine.md")}</p></div>
+        </div>
+      </section>
 
-        <Step n={4} title="Edit" who="The writer · claude.md → mine.md">
-          <div className="ex-pair">
-            <div><span className="eyebrow">Claude&apos;s checked draft</span><pre className="ex-text muted">{fixed}</pre></div>
-            <div><span className="eyebrow accent">What the writer published</span><pre className="ex-text">{mine}</pre></div>
-          </div>
-        </Step>
-
-        <Step n={5} title="Learn" who="/learn pricing">
-          <div className="kept"><b>{kept[2]}%</b><span>of Claude&apos;s words kept ({kept[1]} of {total})</span></div>
-          <div className="md ex-md"><ReactMarkdown remarkPlugins={[remarkGfm]}>{patterns}</ReactMarkdown></div>
-          <span className="eyebrow accent">New rules</span>
-          <ul className="new-rules">{newRules.map(r => <li key={r.title}><b>{r.title}</b><span>{r.why}</span></li>)}</ul>
-        </Step>
-      </div>
-      <p className="note">Real pieces are longer, and day-one kept-words numbers are usually lower. All the files are in <a className="step-link" style={{ marginTop: 0 }} href={blob("examples/pricing")} target="_blank" rel="noreferrer">examples/pricing <ArrowUpRight size={13} aria-hidden="true" /></a>.</p>
-
-      <section className="closer">
-        <h2>Build yours</h2>
-        <p>Copy the prompt into Claude Code. Bring 10 to 20 of your best pieces and the idea for your next one.</p>
-        <a className="btn" href="./">Get the prompt</a>
+      <section className="section" aria-labelledby="rules">
+        <h2 id="rules">Three of those edits became three new rules</h2>
+        <div className="grid-3">
+          {patterns.map((p, i) => <div key={p.why} className="card rule-card">
+            <span className="pill clay" style={{ justifySelf: "start" }}>{rules[i]?.split(". ")[0]}</span>
+            <h3>{rules[i]?.split(". ").slice(1).join(". ")}</h3>
+            <p className="was">{p.was}</p>
+            <p className="now">{p.now}</p>
+            <p className="why label">Why: &ldquo;{p.why}&rdquo;</p>
+          </div>)}
+        </div>
+        <a className="link" href={blob("examples/pricing")} target="_blank" rel="noreferrer">All the files for this example →</a>
       </section>
     </div>
-    <footer className="foot">How to AI · AI 301</footer>
+    <footer className="foot">How to AI · AI 301 · Based on Ruben Hassid&apos;s &ldquo;Who writes this?&rdquo;</footer>
   </>;
 }

@@ -1,79 +1,92 @@
-import type { CSSProperties } from "react";
-import { ArrowUpRight } from "lucide-react";
+import { FileText, Folder, Lightbulb, ListChecks, PenLine, Pencil, RefreshCw, Terminal } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import recipe from "@/content/recipe.json";
-import { REPO, POST, loop, room, principles, prompt } from "@/content/writing";
+import { META_FAIR, POST, classSteps, loop, room } from "@/content/writing";
 import { CopyPrompt } from "./copy-prompt";
 import { Topbar } from "./topbar";
 
 const lines = (recipe as string).trimEnd().split("\n").length;
-const tone = (t: string) => ({ "--tone": `var(--t-${t})`, "--tint": `var(--t-${t}-tint)` }) as CSSProperties;
+const loopIcons = [Lightbulb, PenLine, ListChecks, Pencil, RefreshCw];
+const roomIcons = { rules: ListChecks, folder: Folder, cmd: Terminal, file: FileText };
 
 export default function Page() {
   return <>
     <div className="wrap">
       <Topbar active="steps" />
+      <p className="meta">AI 301 workshop · Writing · From How to AI, for 201 graduates · Copy one prompt</p>
 
-      <header className="hero">
-        <div className="course-tag"><span className="course-num">AI 301</span><span>Live course · Writing</span></div>
-        <h1>Write like you.</h1>
-        <p className="lede">Build a writing room in Claude Code. One Claude drafts, a second Claude checks the draft against your rules, you edit, and every edit becomes a sharper rule. You bring the ideas. Your edits teach it the rest.</p>
-        <CopyPrompt text={recipe as string} lines={lines} />
-        <a className="repo-link" href={REPO} target="_blank" rel="noreferrer"><img src="/logos/github.svg" alt="" width={16} height={16} /> github.com/how-to-ai-co/301-build-recipe-writing <ArrowUpRight size={14} aria-hidden="true" /></a>
+      <header className="top">
+        <h1>One prompt builds a writing room where Claude drafts and your edits become the rules</h1>
+        <div className="ask">
+          <p><b>Paste the prompt into Claude Code at the start of class.</b> Bring 10 to 20 of your best pieces and the idea for your next one.</p>
+          <CopyPrompt text={recipe as string} />
+        </div>
+        <ol className="path" aria-label="The loop">
+          {loop.map((s, i) => {
+            const Icon = loopIcons[i];
+            return <li key={s.name} className={s.you ? "you" : ""}>
+              <span className="who"><b>{i + 1}</b> · {s.who}</span>
+              <h3><Icon size={18} aria-hidden="true" />{s.name}</h3>
+              <code>{s.cmd}</code>
+              <span className="does">{s.does}</span>
+            </li>;
+          })}
+        </ol>
+        <a className="link" href="example">See one piece go through the loop →</a>
       </header>
 
-      <section className="section" aria-labelledby="loop">
-        <div className="section-head">
-          <div><span className="eyebrow accent">How it works</span><h2 id="loop" className="sec-title" style={{ marginBottom: 0 }}>The loop</h2></div>
-          <a className="step-link" href="example">See one piece go through it <ArrowUpRight size={15} aria-hidden="true" /></a>
-        </div>
-        <ol className="loop">
-          {loop.map(s => <li key={s.name} className="loop-step" style={tone(s.tone)}>
-            <span className="loop-n">{s.n}</span>
-            <b>{s.name}</b>
-            <span className="loop-who">{s.who} · <code>{s.cmd}</code></span>
-            <p>{s.what}</p>
-          </li>)}
-        </ol>
-        <p className="note">Then it starts again with your next piece. Each one makes the next draft closer to you.</p>
-      </section>
-
       <section className="section" aria-labelledby="why">
-        <span className="eyebrow accent">Why it&apos;s built this way</span>
-        <h2 id="why" className="sec-title">Rules from your edits, not your adjectives</h2>
-        <div className="picks">
-          {principles.map((p, i) => <div key={p.t} className="pick" style={tone(["orange", "violet", "blue", "green"][i])}><b>{p.t}</b><p>{p.d}</p></div>)}
-        </div>
-        <div className="quote-card">
-          <p>Claude drafted 2,303 words of one issue. Ruben Hassid kept 438. After 127 issues he still rewrites about 80%, and every rewrite becomes a rule.</p>
-          <a className="step-link" href={POST} target="_blank" rel="noreferrer">Read &ldquo;Who writes this?&rdquo; <ArrowUpRight size={14} aria-hidden="true" /></a>
+        <h2 id="why">Claude drafts well but judges writing badly, so only your edits set the rules</h2>
+        <div className="grid-2">
+          <div className="card stat-card">
+            <h3>Ruben Hassid kept 438 of the 2,303 words Claude drafted for one issue</h3>
+            <span className="big">19%</span>
+            <div className="bar-row">
+              <div className="bar-track" role="img" aria-label="438 of 2,303 words kept, 19%"><div className="bar-fill" style={{ width: "19%" }} /></div>
+              <div className="bar-scale"><span>0</span><span>2,303 words</span></div>
+            </div>
+            <a className="link" href={POST} target="_blank" rel="noreferrer">Ruben&apos;s post, 27 Oct 2026 →</a>
+          </div>
+          <div className="card stat-card">
+            <h3>AI judges picked AI-written text over an expert&apos;s most of the time</h3>
+            <span className="big">63.5–84.6%</span>
+            <div className="bar-row">
+              <div className="bar-track" role="img" aria-label="Between 63.5% and 84.6%"><div className="bar-fill range" style={{ left: "63.5%", width: "21.1%" }} /></div>
+              <div className="bar-scale"><span>0%</span><span>50%</span><span>100%</span></div>
+            </div>
+            <a className="link" href={META_FAIR} target="_blank" rel="noreferrer">Meta FAIR, 2026, academic writing →</a>
+          </div>
         </div>
       </section>
 
       <section className="section" aria-labelledby="room">
-        <span className="eyebrow accent">What you leave with</span>
-        <h2 id="room" className="sec-title">Your writing room</h2>
-        <div className="room">
-          <div className="room-head"><span className="room-path">~/Documents/writing-room/</span><span className="lvl Watch">Private on GitHub</span></div>
-          <ul>{room.map(f => <li key={f.path}><code>{f.path}</code><span>{f.what}</span></li>)}</ul>
+        <h2 id="room">After class you have a private folder with five parts</h2>
+        <div className="card">
+          <div className="folder-head"><code>~/Documents/writing-room/</code><span className="pill good">Private on GitHub</span></div>
+          <ul className="folder">
+            {room.map(f => {
+              const Icon = roomIcons[f.icon as keyof typeof roomIcons];
+              return <li key={f.path}><Icon size={18} aria-hidden="true" /><code>{f.path}</code><span className="label">{f.size}</span></li>;
+            })}
+          </ul>
         </div>
-        <p className="note">Bring 10 to 20 of your best recent pieces, and the idea for the next one. Newsletters, LinkedIn posts, client emails, reports and scripts all work.</p>
       </section>
 
-      <section className="does" id="prompt">
-        <span className="eyebrow accent">The prompt</span>
-        <h2>What the prompt does</h2>
-        <p className="lede">You paste it once. Claude works through eight steps, and only stops for your answers, sign-ins, and your own writing.</p>
-        <ol className="does-list">
-          {prompt.map((p, i) => <li key={p.t}><span className="n">{i + 1}</span><div><b>{p.t}</b><p>{p.d}</p></div></li>)}
+      <section className="section" aria-labelledby="class">
+        <h2 id="class">In class, Claude takes you through five steps and stops only for you</h2>
+        <ol className="path">
+          {classSteps.map((s, i) => <li key={s.name} className={s.who !== "Claude" ? "you" : ""}>
+            <span className="who"><b>{i + 1}</b> · {s.who}</span>
+            <h3>{s.name}</h3>
+          </li>)}
         </ol>
-        <details className="full">
-          <summary>Read the full prompt</summary>
+        <details className="more">
+          <summary>Read the full prompt ({lines} lines)</summary>
           <div className="md"><ReactMarkdown remarkPlugins={[remarkGfm]}>{recipe as string}</ReactMarkdown></div>
         </details>
       </section>
     </div>
-    <footer className="foot">How to AI · AI 301</footer>
+    <footer className="foot">How to AI · AI 301 · Based on Ruben Hassid&apos;s &ldquo;Who writes this?&rdquo;</footer>
   </>;
 }
