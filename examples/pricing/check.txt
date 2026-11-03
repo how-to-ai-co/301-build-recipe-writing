@@ -1,0 +1,15 @@
+CHECK: drafts/pricing/claude.md
+Broken: 5
+
+R1 · "In today's issue, I want to talk about pricing, one of the most important decisions any freelancer makes."
+     breaks: open with the claim, never with context
+R3 · "Many freelancers struggle with pricing."
+     breaks: a number instead of "many", "a lot", "significant"
+R3 · "hourly pricing can significantly limit your income"
+     breaks: a number instead of "many", "a lot", "significant"
+R4 · "No one tells you this when you start out"
+     breaks: never start a sentence with "No"
+R6 · "In conclusion, if you want to grow your freelance business, it might be worth considering..."
+     breaks: end on the action, not a summary
+
+Clean: R2, R5

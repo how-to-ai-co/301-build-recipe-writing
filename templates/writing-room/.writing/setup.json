@@ -1,0 +1,17 @@
+{
+  "kind": null,
+  "sources": [],
+  "has_pairs": null,
+  "next_piece": null,
+  "github": { "account": null, "repo_url": null, "private": null },
+  "confidential": null,
+  "progress": {
+    "room_created": false,
+    "archive_count": 0,
+    "rules_count": 0,
+    "checker_tested": false,
+    "backed_up": false,
+    "first_piece": null,
+    "safety_check": false
+  }
+}
