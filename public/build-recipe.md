@@ -29,7 +29,7 @@ Use the playbooks and templates at https://github.com/how-to-ai-co/301-build-rec
 Ask these together, in one or two screens. Skip any question my earlier answers make unnecessary.
 
 1. **What do you write most?** (choose one to start) Newsletter / LinkedIn posts / Client emails / Reports or proposals / Video or podcast scripts / Blog posts / Something else.
-2. **Where do your past pieces live?** (choose any) Substack / LinkedIn / Gmail or Outlook sent mail / Google Docs / Word files / A website or blog / Scattered.
+2. **Where do your past pieces live?** (choose any) Substack / LinkedIn / Gmail or Outlook sent mail / Google Docs / Word files / A website or blog / Scattered. Ask for the link to my own publication or profile (for example `yourname.substack.com`). If a Substack or other connector is already set up in Claude, check whose account it is before using it: only gather writing I wrote.
 3. **Do you have before-and-after pairs?** An AI draft and the version you actually published. Yes, several / A few / No.
 4. **What is the next piece you need to write?** One line is enough. We will write it in class.
 5. **Do you have a GitHub account?** Yes / No / Not sure.
