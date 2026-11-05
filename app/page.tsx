@@ -1,92 +1,84 @@
-import { FileText, Folder, Lightbulb, ListChecks, PenLine, Pencil, RefreshCw, Terminal } from "lucide-react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import type { CSSProperties } from "react";
 import recipe from "@/content/recipe.json";
-import { META_FAIR, POST, classSteps, loop, room } from "@/content/writing";
 import { CopyPrompt } from "./copy-prompt";
-import { Topbar } from "./topbar";
 
-const lines = (recipe as string).trimEnd().split("\n").length;
-const loopIcons = [Lightbulb, PenLine, ListChecks, Pencil, RefreshCw];
-const roomIcons = { rules: ListChecks, folder: Folder, cmd: Terminal, file: FileText };
+const css = (v: Record<string, string | number>) => v as CSSProperties;
+
+function Archive() {
+  const pieces = [["Newsletter", 92], ["LinkedIn post", 70], ["Client email", 84]] as const;
+  return <div className="viz viz-archive">
+    {pieces.map(([name, w], i) => <div key={name} className="page" style={css({ "--i": i })}>
+      <b>{name}</b><i style={{ width: `${w}%` }} /><i style={{ width: `${w - 18}%` }} /><i style={{ width: `${w - 6}%` }} />
+    </div>)}
+  </div>;
+}
+
+function Draft() {
+  const lines = [96, 88, 92, 60];
+  return <div className="viz viz-draft">
+    <div className="sheet">
+      <img src="logos/claude.svg" alt="" width={22} height={22} />
+      {lines.map((w, i) => <i key={i} style={css({ "--w": `${w}%`, "--i": i })} />)}
+    </div>
+  </div>;
+}
+
+function Check() {
+  return <div className="viz viz-check">
+    <div className="sheet">
+      <p>Pricing is one of the most important decisions you will make.</p>
+      <p className="hit">In today&apos;s fast-moving world, every dollar counts.</p>
+      <p>Start with what the client already pays.</p>
+    </div>
+    <span className="flag">Rule 3: no filler openers</span>
+  </div>;
+}
+
+function Edit() {
+  return <div className="viz viz-edit">
+    <div className="sheet">
+      <p><s>In today&apos;s fast-moving world, every dollar counts.</s></p>
+      <p className="new">Your client already knows what they pay.</p>
+    </div>
+  </div>;
+}
+
+function Rules() {
+  const rules = ["Say the number first", "No filler openers", "Short words over long ones"];
+  return <div className="viz viz-rules">
+    <ul>{rules.map((r, i) => <li key={r} className={i === rules.length - 1 ? "added" : ""}><span>{i + 1}</span>{r}</li>)}</ul>
+  </div>;
+}
+
+const steps = [
+  { t: "Bring your best writing", d: "10 to 20 pieces you are proud of.", v: <Archive /> },
+  { t: "Claude drafts", d: "From your idea and your opinion.", v: <Draft /> },
+  { t: "A second Claude checks", d: "Against your rules, nothing else.", v: <Check /> },
+  { t: "You edit", d: "Make it sound like you.", v: <Edit /> },
+  { t: "Your edits become rules", d: "Every draft gets closer.", v: <Rules /> },
+];
 
 export default function Page() {
   return <>
     <div className="wrap">
-      <Topbar active="steps" />
-      <p className="meta">AI 301 workshop · Writing · From How to AI, for 201 graduates · Copy one prompt</p>
+      <div className="topbar"><span className="wordmark">How to AI<span className="dot">.</span></span><span className="eyebrow">AI 301 · Writing</span></div>
 
-      <header className="top">
-        <h1>One prompt builds a writing room where Claude drafts and your edits become the rules</h1>
-        <div className="ask">
-          <p><b>Paste the prompt into Claude Code at the start of class.</b> Bring 10 to 20 of your best pieces and the idea for your next one.</p>
-          <CopyPrompt text={recipe as string} />
-        </div>
-        <ol className="path" aria-label="The loop">
-          {loop.map((s, i) => {
-            const Icon = loopIcons[i];
-            return <li key={s.name} className={s.you ? "you" : ""}>
-              <span className="who"><b>{i + 1}</b> · {s.who}</span>
-              <h3><Icon size={18} aria-hidden="true" />{s.name}</h3>
-              <code>{s.cmd}</code>
-              <span className="does">{s.does}</span>
-            </li>;
-          })}
-        </ol>
-        <a className="link" href="example">See one piece go through the loop →</a>
+      <header className="hero">
+        <h1>Make Claude write like you.</h1>
+        <CopyPrompt text={recipe as string} />
       </header>
 
-      <section className="section" aria-labelledby="why">
-        <h2 id="why">Claude drafts well but judges writing badly, so only your edits set the rules</h2>
-        <div className="grid-2">
-          <div className="card stat-card">
-            <h3>Ruben Hassid kept 438 of the 2,303 words Claude drafted for one issue</h3>
-            <span className="big">19%</span>
-            <div className="bar-row">
-              <div className="bar-track" role="img" aria-label="438 of 2,303 words kept, 19%"><div className="bar-fill" style={{ width: "19%" }} /></div>
-              <div className="bar-scale"><span>0</span><span>2,303 words</span></div>
-            </div>
-            <a className="link" href={POST} target="_blank" rel="noreferrer">Ruben&apos;s post, 27 Oct 2026 →</a>
+      <ol className="flow-steps" aria-label="How it works">
+        {steps.map((s, i) => <li key={s.t} className="step">
+          <div className="step-text">
+            <span className="big-num">{i + 1}</span>
+            <h2>{s.t}</h2>
+            <p>{s.d}</p>
           </div>
-          <div className="card stat-card">
-            <h3>AI judges picked AI-written text over an expert&apos;s most of the time</h3>
-            <span className="big">63.5–84.6%</span>
-            <div className="bar-row">
-              <div className="bar-track" role="img" aria-label="Between 63.5% and 84.6%"><div className="bar-fill range" style={{ left: "63.5%", width: "21.1%" }} /></div>
-              <div className="bar-scale"><span>0%</span><span>50%</span><span>100%</span></div>
-            </div>
-            <a className="link" href={META_FAIR} target="_blank" rel="noreferrer">Meta FAIR, 2026, academic writing →</a>
-          </div>
-        </div>
-      </section>
-
-      <section className="section" aria-labelledby="room">
-        <h2 id="room">After class you have a private folder with five parts</h2>
-        <div className="card">
-          <div className="folder-head"><code>~/Documents/writing-room/</code><span className="pill good">Private on GitHub</span></div>
-          <ul className="folder">
-            {room.map(f => {
-              const Icon = roomIcons[f.icon as keyof typeof roomIcons];
-              return <li key={f.path}><Icon size={18} aria-hidden="true" /><code>{f.path}</code><span className="label">{f.size}</span></li>;
-            })}
-          </ul>
-        </div>
-      </section>
-
-      <section className="section" aria-labelledby="class">
-        <h2 id="class">In class, Claude takes you through five steps and stops only for you</h2>
-        <ol className="path">
-          {classSteps.map((s, i) => <li key={s.name} className={s.who !== "Claude" ? "you" : ""}>
-            <span className="who"><b>{i + 1}</b> · {s.who}</span>
-            <h3>{s.name}</h3>
-          </li>)}
-        </ol>
-        <details className="more">
-          <summary>Read the full prompt ({lines} lines)</summary>
-          <div className="md"><ReactMarkdown remarkPlugins={[remarkGfm]}>{recipe as string}</ReactMarkdown></div>
-        </details>
-      </section>
+          <div aria-hidden="true">{s.v}</div>
+        </li>)}
+      </ol>
     </div>
-    <footer className="foot">How to AI · AI 301 · Based on Ruben Hassid&apos;s &ldquo;Who writes this?&rdquo;</footer>
+    <footer className="foot">How to AI · AI 301</footer>
   </>;
 }

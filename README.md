@@ -14,7 +14,7 @@ Prerequisite: the AI 201 live workshop (Claude Code and connectors).
 - **`AGENTS.md`** and **`CONVENTIONS.md`**: orientation for the agent that clones this repo, and the fixed names (the student's folder, the loop, the rule format, the limits).
 - **`templates/writing-room/`**: the starter folder copied to `~/Documents/writing-room/`: `CLAUDE.md`, `RULES.md`, the drafter and checker subagents, the `/draft`, `/check`, `/learn` and `/prune` skills, and `tools/kept_words.py`.
 - **`playbook/`**: the loop, gathering past writing, seeding the first rules (before/after pairs or the blind rewrite), notes per kind of writing, GitHub, pruning, and safety with the end-of-class checklist.
-- **`examples/pricing/`**: one short piece through the whole loop. The handout's example page reads these files.
+- **`examples/pricing/`**: one short piece through the whole loop.
 - **`research/writing-research.md`**: the research behind the design, with sources. Checked 2 November 2026.
 - **`app/`, `content/`**: the handout site.
 
