@@ -51,7 +51,7 @@ function Rules() {
 }
 
 const steps = [
-  { t: "Bring your best writing", d: "10 to 20 pieces you are proud of.", v: <Archive /> },
+  { t: "Bring your best writing", d: "Your Substack or blog link.", v: <Archive /> },
   { t: "Claude drafts", d: "From your idea and your opinion.", v: <Draft /> },
   { t: "A second Claude checks", d: "Against your rules, nothing else.", v: <Check /> },
   { t: "You edit", d: "Make it sound like you.", v: <Edit /> },
