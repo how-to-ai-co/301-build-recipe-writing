@@ -30,6 +30,8 @@ ul, ol { list-style: none; margin: 0; padding: 0 }
 .btn:hover { background: var(--accent-hover) }
 .foot { border-top: 1px solid var(--line); padding: 22px; text-align: center; font-size: 12.5px; color: var(--muted) }
 
+.loop { display: block; width: 100%; margin-top: 48px; border-radius: 14px; border: 1px solid var(--line); background: var(--bg) }
+
 /* the five steps */
 .flow-steps { display: grid; gap: 18px; margin-top: 56px }
 .step { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 32px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 28px 32px }

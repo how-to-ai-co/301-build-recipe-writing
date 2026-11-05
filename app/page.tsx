@@ -68,6 +68,8 @@ export default function Page() {
         <CopyPrompt text={recipe as string} />
       </header>
 
+      <video className="loop" src="loop.mp4" poster="loop-poster.png" autoPlay muted loop playsInline aria-label="Claude drafts, Claude checks, you edit, and your edit becomes a new rule" />
+
       <ol className="flow-steps" aria-label="How it works">
         {steps.map((s, i) => <li key={s.t} className="step">
           <div className="step-text">
